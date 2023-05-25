@@ -1,0 +1,5 @@
+SELECT COUNT(title), year
+FROM papers
+WHERE year BETWEEN 2010 AND 2015
+GROUP BY year;
+

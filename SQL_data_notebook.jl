@@ -79,10 +79,24 @@ end
 @time df_2012 = get_authors_for_year(2012)
 
 # ╔═╡ c9a59c9d-5843-4ff0-8e70-a042d6f36801
+md"
+#### Count number of papers per year
+"
 
+# ╔═╡ e6cc3a26-6120-4856-a3cc-034b0f4bc602
+function count_papers(year_start::Int64,
+	                  year_end::Int64,
+                      df_papers::DataFrame = df_papers)
 
-# ╔═╡ 445e5fdc-44e8-458a-941c-7faebab5202d
+	gdf_papers = groupby(df_papers, :year)
+	df_count = combine(x -> length(x.title), gdf_papers)
 
+	return filter(row -> year_start ≤ row.year ≤ year_end, df_count)
+
+end
+
+# ╔═╡ ee923163-93c4-4d46-806a-5db6f28a4c00
+@time count_papers(2010, 2015)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -459,7 +473,8 @@ version = "17.4.0+0"
 # ╟─0e8b8ce1-7289-4f64-890b-b3d3195700e5
 # ╠═7775b202-ece0-4019-8b7f-31b760250292
 # ╠═9b64889d-b9ab-4ae7-9f5f-d58e6039efac
-# ╠═c9a59c9d-5843-4ff0-8e70-a042d6f36801
-# ╠═445e5fdc-44e8-458a-941c-7faebab5202d
+# ╟─c9a59c9d-5843-4ff0-8e70-a042d6f36801
+# ╟─e6cc3a26-6120-4856-a3cc-034b0f4bc602
+# ╠═ee923163-93c4-4d46-806a-5db6f28a4c00
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

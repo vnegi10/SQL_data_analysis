@@ -7,14 +7,26 @@ Practice queries are present as sql files. The `sqlite3`
 [command-line](https://www.sqlite.org/cli.html) tool can be used to
 perform SQL queries on the database.
 
+Additionally, the same database can also be analyzed by converting relevant
+tables to a Julia DataFrame. The steps are shown in a Pluto notebook.
+
 ## Installation
 
-### Ubuntu
+### SQLite command-line tool on Ubuntu
     $ sudo apt install sqlite3
     $ sqlite3 -version
     ## 3.37.2 2022-01-06 13:25:41 872ba256cbf61d9290b571c0e6d82a20c224ca3ad82971edc46b29818d5dalt1
 
-## Examples
+### Pluto.jl
+    using Pkg
+    Pkg.add("Pluto")
+    using Pluto
+    Pluto.run()
+
+Clone this repository and open **SQL_data_notebook.jl** in your Pluto browser window. That's it,
+and you are good to go!
+
+## Examples for using sqlite3
 
 Open a database and check the schema:
 ```

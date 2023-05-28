@@ -5,7 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 8adc3334-fcd1-11ed-2f59-9fa2b2d3093f
-using SQLite, DataFrames
+using SQLite, DataFrames, CSV
 
 # ╔═╡ 6bc5a433-f8a2-4145-acd9-4f4dfab3fa56
 md"
@@ -18,7 +18,7 @@ md"
 "
 
 # ╔═╡ 7bfcd49e-38cb-4622-b9e9-cd1a5395049d
-db = SQLite.DB("nips_papers.sqlite")
+db = SQLite.DB("input_sqlite_database/nips_papers.sqlite")
 
 # ╔═╡ ddbb848a-1849-4670-8909-9a1496d9ee7d
 md"
@@ -158,12 +158,6 @@ function get_authors_all_years(authors_dict::Dict,
 
 end
 
-# ╔═╡ d34fcda5-62ad-4556-94ed-2a686387c5d3
-A = ["test", "again", "this"]
-
-# ╔═╡ 31a7536b-a0eb-4371-b75d-dd995ae0b7d6
-join(A, ", ")
-
 # ╔═╡ 7775b202-ece0-4019-8b7f-31b760250292
 #filter(row -> row.year == 2012, df_papers)
 
@@ -220,25 +214,25 @@ function save_to_db(df_input::DataFrame,
 end
 
 # ╔═╡ b3e79263-808f-411c-aba8-fdee9a02c4ee
-save_to_db(df_all_authors, "papers_from_julia.sqlite", "papers")
+#save_to_db(df_all_authors, "output/papers_from_julia.sqlite", "papers")
 
 # ╔═╡ 3c3a6b0a-302c-448f-9a45-2e259ff83af2
-#=SQLite.load!(df_all_authors, 
-	         db_save, 
-	         "papers"; 
-             temp = false, 
-             ifnotexists = false, 
-             replace = false, 
-             on_conflict = nothing, 
-             analyze = false)=#
+md"
+## Save to CSV
+"
+
+# ╔═╡ 677adb14-fd8c-4ad8-9473-654239758a67
+#CSV.write("output/papers_from_julia.csv", df_all_authors)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
 
 [compat]
+CSV = "~0.10.10"
 DataFrames = "~1.5.0"
 SQLite = "~1.6.0"
 """
@@ -249,7 +243,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0"
 manifest_format = "2.0"
-project_hash = "fa8043e5cff4af4df9a61897f209cca07494503f"
+project_hash = "cbbd523c877545bcfc2b66c004a60ba39afde999"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -260,6 +254,18 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+
+[[deps.CSV]]
+deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "PrecompileTools", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings", "WorkerUtilities"]
+git-tree-sha1 = "ed28c86cbde3dc3f53cf76643c2e9bc11d56acc7"
+uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+version = "0.10.10"
+
+[[deps.CodecZlib]]
+deps = ["TranscodingStreams", "Zlib_jll"]
+git-tree-sha1 = "9c209fb7536406834aa938fb149964b985de6c83"
+uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+version = "0.7.1"
 
 [[deps.Compat]]
 deps = ["UUIDs"]
@@ -316,6 +322,12 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.6.0"
+
+[[deps.FilePathsBase]]
+deps = ["Compat", "Dates", "Mmap", "Printf", "Test", "UUIDs"]
+git-tree-sha1 = "e27c4ebe80e8699540f2d6c805cc12203b614f12"
+uuid = "48062228-2e41-5def-b9a4-89aafe57970f"
+version = "0.9.20"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -404,6 +416,9 @@ deps = ["DataAPI"]
 git-tree-sha1 = "f66bdc5de519e8f8ae43bdc598782d35a25b1272"
 uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
 version = "1.1.0"
+
+[[deps.Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
@@ -560,6 +575,12 @@ version = "1.10.0"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[[deps.TranscodingStreams]]
+deps = ["Random", "Test"]
+git-tree-sha1 = "9a6ae7ed916312b41236fcef7e0af564ef934769"
+uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+version = "0.9.13"
+
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
@@ -572,6 +593,11 @@ deps = ["DataAPI", "InlineStrings", "Parsers"]
 git-tree-sha1 = "b1be2855ed9ed8eac54e5caff2afcdb442d52c23"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 version = "1.4.2"
+
+[[deps.WorkerUtilities]]
+git-tree-sha1 = "cd1659ba0d57b71a464a29e64dbc67cfe83d54e7"
+uuid = "76eceee3-57b5-4d4a-8e66-0e911cebbf60"
+version = "1.6.1"
 
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
@@ -612,8 +638,6 @@ version = "17.4.0+0"
 # ╟─0e8b8ce1-7289-4f64-890b-b3d3195700e5
 # ╟─e49c1a70-8d2e-457b-a72c-f03da4cdc62d
 # ╟─6e0eee5f-08cd-446d-a227-11f7074d6503
-# ╠═d34fcda5-62ad-4556-94ed-2a686387c5d3
-# ╠═31a7536b-a0eb-4371-b75d-dd995ae0b7d6
 # ╠═7775b202-ece0-4019-8b7f-31b760250292
 # ╠═9b64889d-b9ab-4ae7-9f5f-d58e6039efac
 # ╠═0f33b5b1-0fd6-48b8-a801-2f719a559059
@@ -624,6 +648,7 @@ version = "17.4.0+0"
 # ╟─92461804-f7ae-4bab-9d7c-8b2d09690153
 # ╟─c12d08b2-3aed-4104-9728-e3b213f6aac5
 # ╠═b3e79263-808f-411c-aba8-fdee9a02c4ee
-# ╠═3c3a6b0a-302c-448f-9a45-2e259ff83af2
+# ╟─3c3a6b0a-302c-448f-9a45-2e259ff83af2
+# ╠═677adb14-fd8c-4ad8-9473-654239758a67
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

@@ -20,11 +20,28 @@ md"
 # ╔═╡ 7bfcd49e-38cb-4622-b9e9-cd1a5395049d
 db = SQLite.DB("nips_papers.sqlite")
 
+# ╔═╡ ddbb848a-1849-4670-8909-9a1496d9ee7d
+md"
+#### Check schema (tables and columns)
+"
+
+# ╔═╡ ac083d1e-ab05-4c05-bbb8-565043b5c7fb
+SQLite.tables(db)
+
+# ╔═╡ ca5ae6e6-5e83-4912-a774-7ac1d97767df
+SQLite.columns(db, "papers")
+
 # ╔═╡ 80124aef-07a4-4bba-9216-1815075734be
 df_papers = DBInterface.execute(db, "SELECT id, year, title FROM papers") |> DataFrame
 
 # ╔═╡ 8ab8e038-7f4a-490f-9461-bd8514420fa1
 df_authors = DBInterface.execute(db, "SELECT id, name FROM authors") |> DataFrame
+
+# ╔═╡ 3a332bd5-3a97-4e56-8019-1db081234726
+authors_dict = Pair.(df_authors.id, df_authors.name) |> Dict
+
+# ╔═╡ 750abca5-709c-4ec5-8e95-bf5849d6cc10
+authors_dict[3220]
 
 # ╔═╡ 5c0d688d-bc41-40f3-91f8-7e704ca82169
 df_paper_authors = DBInterface.execute(db, "SELECT paper_id, author_id FROM paper_authors") |> DataFrame
@@ -72,11 +89,92 @@ function get_authors_for_year(search_year::Int64,
 
 end
 
+# ╔═╡ e49c1a70-8d2e-457b-a72c-f03da4cdc62d
+function get_authors_all_years(df_authors::DataFrame,
+	                           df_papers::DataFrame = df_papers,
+	                           df_paper_authors::DataFrame = df_paper_authors)
+
+	df_result = deepcopy(df_papers)
+	author_ids = Vector{Int64}[]
+
+	for p_id in df_result[!, :id]
+		df_filter = filter(row -> row.paper_id == p_id, df_paper_authors)
+		push!(author_ids, df_filter[!, :author_id])
+	end
+
+	author_names = Vector{String}[]
+
+	for author_group in author_ids
+		names_group = String[]
+		
+		for a_id in author_group
+			df_filter = filter(row -> row.id == a_id, df_authors)
+			# Each id maps to a unique author name
+			push!(names_group, df_filter[!, :name][1])
+		end
+		push!(author_names, names_group)
+	end
+
+	insertcols!(df_result, 3, :authors => author_names)
+
+	return df_result
+
+end
+
+# ╔═╡ 6e0eee5f-08cd-446d-a227-11f7074d6503
+function get_authors_all_years(authors_dict::Dict,
+	                           df_papers::DataFrame = df_papers,
+	                           df_paper_authors::DataFrame = df_paper_authors)
+
+	df_result = deepcopy(df_papers)
+	author_ids = Vector{Int64}[]
+
+	for p_id in df_result[!, :id]
+		df_filter = filter(row -> row.paper_id == p_id, df_paper_authors)
+		push!(author_ids, df_filter[!, :author_id])
+	end
+
+	author_names = Vector{String}[]
+
+	for author_group in author_ids
+		names_group = String[]
+		
+		for a_id in author_group
+			# Each id maps to a unique author name
+			push!(names_group, authors_dict[a_id])
+		end
+		push!(author_names, names_group)
+	end
+
+	# Merge author names into one row
+	authors = String[]
+	for author in author_names
+		push!(authors, join(author, ", "))
+	end		
+
+	insertcols!(df_result, 3, :authors => authors)
+
+	return df_result
+
+end
+
+# ╔═╡ d34fcda5-62ad-4556-94ed-2a686387c5d3
+A = ["test", "again", "this"]
+
+# ╔═╡ 31a7536b-a0eb-4371-b75d-dd995ae0b7d6
+join(A, ", ")
+
 # ╔═╡ 7775b202-ece0-4019-8b7f-31b760250292
 #filter(row -> row.year == 2012, df_papers)
 
 # ╔═╡ 9b64889d-b9ab-4ae7-9f5f-d58e6039efac
-@time df_2012 = get_authors_for_year(2012)
+#@time df_2012 = get_authors_for_year(2012)
+
+# ╔═╡ 0f33b5b1-0fd6-48b8-a801-2f719a559059
+@time get_authors_all_years(df_authors)
+
+# ╔═╡ 4e4bd98e-b773-4163-b752-48423bef1fdf
+@time df_all_authors = get_authors_all_years(authors_dict)
 
 # ╔═╡ c9a59c9d-5843-4ff0-8e70-a042d6f36801
 md"
@@ -97,6 +195,42 @@ end
 
 # ╔═╡ ee923163-93c4-4d46-806a-5db6f28a4c00
 @time count_papers(2010, 2015)
+
+# ╔═╡ 92461804-f7ae-4bab-9d7c-8b2d09690153
+md"
+## Save to database
+"
+
+# ╔═╡ c12d08b2-3aed-4104-9728-e3b213f6aac5
+function save_to_db(df_input::DataFrame, 
+	                db_name::String, 
+	                table_name::String)
+
+	db_save = SQLite.DB(db_name)
+
+	SQLite.load!(df_input, 
+	         db_save, 
+	         table_name; 
+             temp = false, 
+             ifnotexists = false, 
+             replace = false, 
+             on_conflict = nothing, 
+             analyze = false)	
+
+end
+
+# ╔═╡ b3e79263-808f-411c-aba8-fdee9a02c4ee
+save_to_db(df_all_authors, "papers_from_julia.sqlite", "papers")
+
+# ╔═╡ 3c3a6b0a-302c-448f-9a45-2e259ff83af2
+#=SQLite.load!(df_all_authors, 
+	         db_save, 
+	         "papers"; 
+             temp = false, 
+             ifnotexists = false, 
+             replace = false, 
+             on_conflict = nothing, 
+             analyze = false)=#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -465,16 +599,31 @@ version = "17.4.0+0"
 # ╠═8adc3334-fcd1-11ed-2f59-9fa2b2d3093f
 # ╟─de30a116-edc4-40e3-9591-2b7930904530
 # ╠═7bfcd49e-38cb-4622-b9e9-cd1a5395049d
+# ╟─ddbb848a-1849-4670-8909-9a1496d9ee7d
+# ╠═ac083d1e-ab05-4c05-bbb8-565043b5c7fb
+# ╠═ca5ae6e6-5e83-4912-a774-7ac1d97767df
 # ╠═80124aef-07a4-4bba-9216-1815075734be
 # ╠═8ab8e038-7f4a-490f-9461-bd8514420fa1
+# ╠═3a332bd5-3a97-4e56-8019-1db081234726
+# ╠═750abca5-709c-4ec5-8e95-bf5849d6cc10
 # ╠═5c0d688d-bc41-40f3-91f8-7e704ca82169
 # ╟─ee7c1b4f-5a2d-420a-ac06-a89420463121
 # ╟─ee579482-6db0-46ca-af92-c55682de52d1
 # ╟─0e8b8ce1-7289-4f64-890b-b3d3195700e5
+# ╟─e49c1a70-8d2e-457b-a72c-f03da4cdc62d
+# ╟─6e0eee5f-08cd-446d-a227-11f7074d6503
+# ╠═d34fcda5-62ad-4556-94ed-2a686387c5d3
+# ╠═31a7536b-a0eb-4371-b75d-dd995ae0b7d6
 # ╠═7775b202-ece0-4019-8b7f-31b760250292
 # ╠═9b64889d-b9ab-4ae7-9f5f-d58e6039efac
+# ╠═0f33b5b1-0fd6-48b8-a801-2f719a559059
+# ╠═4e4bd98e-b773-4163-b752-48423bef1fdf
 # ╟─c9a59c9d-5843-4ff0-8e70-a042d6f36801
 # ╟─e6cc3a26-6120-4856-a3cc-034b0f4bc602
 # ╠═ee923163-93c4-4d46-806a-5db6f28a4c00
+# ╟─92461804-f7ae-4bab-9d7c-8b2d09690153
+# ╟─c12d08b2-3aed-4104-9728-e3b213f6aac5
+# ╠═b3e79263-808f-411c-aba8-fdee9a02c4ee
+# ╠═3c3a6b0a-302c-448f-9a45-2e259ff83af2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

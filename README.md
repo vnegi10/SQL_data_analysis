@@ -18,14 +18,18 @@ tables to a Julia DataFrame. The relevant steps are discussed in this
     $ sqlite3 -version
     ## 3.37.2 2022-01-06 13:25:41 872ba256cbf61d9290b571c0e6d82a20c224ca3ad82971edc46b29818d5dalt1
 
-### Pluto.jl
+### Pluto.jl in Julia
     using Pkg
     Pkg.add("Pluto")
     using Pluto
     Pluto.run()
 
-Clone this repository and open **SQL_data_notebook.jl** in your Pluto browser window. That's it,
-and you are good to go!
+### Git LFS
+The database files (*.sqlite) are tracked using Large File Storage (LFS). If not already
+configured, follow the instructions [here.](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)
+
+Once everthing is set up, clone this repository and open **SQL_data_notebook.jl** in your 
+Pluto browser window. That's it, you should be good to go!
 
 ## Examples for using sqlite3
 

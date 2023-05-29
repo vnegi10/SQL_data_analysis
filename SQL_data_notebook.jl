@@ -5,7 +5,7 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 8adc3334-fcd1-11ed-2f59-9fa2b2d3093f
-using SQLite, DataFrames, CSV
+using SQLite, DataFrames, CSV, PlutoUI
 
 # ╔═╡ 6bc5a433-f8a2-4145-acd9-4f4dfab3fa56
 md"
@@ -39,9 +39,6 @@ df_authors = DBInterface.execute(db, "SELECT id, name FROM authors") |> DataFram
 
 # ╔═╡ 3a332bd5-3a97-4e56-8019-1db081234726
 authors_dict = Pair.(df_authors.id, df_authors.name) |> Dict
-
-# ╔═╡ 750abca5-709c-4ec5-8e95-bf5849d6cc10
-authors_dict[3220]
 
 # ╔═╡ 5c0d688d-bc41-40f3-91f8-7e704ca82169
 df_paper_authors = DBInterface.execute(db, "SELECT paper_id, author_id FROM paper_authors") |> DataFrame
@@ -165,10 +162,10 @@ end
 #@time df_2012 = get_authors_for_year(2012)
 
 # ╔═╡ 0f33b5b1-0fd6-48b8-a801-2f719a559059
-@time get_authors_all_years(df_authors)
+#get_authors_all_years(df_authors)
 
 # ╔═╡ 4e4bd98e-b773-4163-b752-48423bef1fdf
-@time df_all_authors = get_authors_all_years(authors_dict)
+df_all_authors = get_authors_all_years(authors_dict)
 
 # ╔═╡ c9a59c9d-5843-4ff0-8e70-a042d6f36801
 md"
@@ -188,7 +185,7 @@ function count_papers(year_start::Int64,
 end
 
 # ╔═╡ ee923163-93c4-4d46-806a-5db6f28a4c00
-@time count_papers(2010, 2015)
+df_count = count_papers(1970, 2020)
 
 # ╔═╡ 92461804-f7ae-4bab-9d7c-8b2d09690153
 md"
@@ -214,7 +211,7 @@ function save_to_db(df_input::DataFrame,
 end
 
 # ╔═╡ b3e79263-808f-411c-aba8-fdee9a02c4ee
-#save_to_db(df_all_authors, "output/papers_from_julia.sqlite", "papers")
+#save_to_db(df_count, "output/papers_from_julia.sqlite", "paper_count")
 
 # ╔═╡ 3c3a6b0a-302c-448f-9a45-2e259ff83af2
 md"
@@ -229,11 +226,13 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
 
 [compat]
 CSV = "~0.10.10"
 DataFrames = "~1.5.0"
+PlutoUI = "~0.7.51"
 SQLite = "~1.6.0"
 """
 
@@ -243,7 +242,13 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0"
 manifest_format = "2.0"
-project_hash = "cbbd523c877545bcfc2b66c004a60ba39afde999"
+project_hash = "a4d52753f94d3301b4c4f98ac58b5419abd230e9"
+
+[[deps.AbstractPlutoDingetjes]]
+deps = ["Pkg"]
+git-tree-sha1 = "8eaf9f1b4921132a4cff3f36a1d9ba923b14a481"
+uuid = "6e696c72-6542-2067-7265-42206c756150"
+version = "1.1.4"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -266,6 +271,12 @@ deps = ["TranscodingStreams", "Zlib_jll"]
 git-tree-sha1 = "9c209fb7536406834aa938fb149964b985de6c83"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
 version = "0.7.1"
+
+[[deps.ColorTypes]]
+deps = ["FixedPointNumbers", "Random"]
+git-tree-sha1 = "eb7f0f8307f71fac7c606984ea5fb2817275d6e4"
+uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+version = "0.11.4"
 
 [[deps.Compat]]
 deps = ["UUIDs"]
@@ -332,6 +343,12 @@ version = "0.9.20"
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
+[[deps.FixedPointNumbers]]
+deps = ["Statistics"]
+git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
+uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+version = "0.8.4"
+
 [[deps.Formatting]]
 deps = ["Printf"]
 git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
@@ -341,6 +358,24 @@ version = "0.4.2"
 [[deps.Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+
+[[deps.Hyperscript]]
+deps = ["Test"]
+git-tree-sha1 = "8d511d5b81240fc8e6802386302675bdf47737b9"
+uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
+version = "0.0.4"
+
+[[deps.HypertextLiteral]]
+deps = ["Tricks"]
+git-tree-sha1 = "c47c5fa4c5308f27ccaac35504858d8914e102f9"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.4"
+
+[[deps.IOCapture]]
+deps = ["Logging", "Random"]
+git-tree-sha1 = "d75853a0bdbfb1ac815478bacd89cd27b550ace6"
+uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
+version = "0.2.3"
 
 [[deps.InlineStrings]]
 deps = ["Parsers"]
@@ -367,6 +402,12 @@ deps = ["Preferences"]
 git-tree-sha1 = "abc9885a7ca2052a736a600f7fa66209f96506e1"
 uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
 version = "1.4.1"
+
+[[deps.JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.4"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "f2355693d6778a178ade15952b7ac47a4ff97996"
@@ -401,6 +442,11 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+
+[[deps.MIMEs]]
+git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "0.1.4"
 
 [[deps.Markdown]]
 deps = ["Base64"]
@@ -448,6 +494,12 @@ version = "2.5.10"
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 version = "1.9.0"
+
+[[deps.PlutoUI]]
+deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
+git-tree-sha1 = "b478a748be27bd2f2c73a7690da219d0844db305"
+uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+version = "0.7.51"
 
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]
@@ -581,6 +633,16 @@ git-tree-sha1 = "9a6ae7ed916312b41236fcef7e0af564ef934769"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.9.13"
 
+[[deps.Tricks]]
+git-tree-sha1 = "aadb748be58b492045b4f56166b5188aa63ce549"
+uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
+version = "0.1.7"
+
+[[deps.URIs]]
+git-tree-sha1 = "074f993b0ca030848b897beff716d93aca60f06a"
+uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+version = "1.4.2"
+
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
@@ -631,7 +693,6 @@ version = "17.4.0+0"
 # ╠═80124aef-07a4-4bba-9216-1815075734be
 # ╠═8ab8e038-7f4a-490f-9461-bd8514420fa1
 # ╠═3a332bd5-3a97-4e56-8019-1db081234726
-# ╠═750abca5-709c-4ec5-8e95-bf5849d6cc10
 # ╠═5c0d688d-bc41-40f3-91f8-7e704ca82169
 # ╟─ee7c1b4f-5a2d-420a-ac06-a89420463121
 # ╟─ee579482-6db0-46ca-af92-c55682de52d1

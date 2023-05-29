@@ -8,7 +8,8 @@ Practice queries are present as sql files. The `sqlite3`
 perform SQL queries on the database.
 
 Additionally, the same database can also be analyzed by converting relevant
-tables to a Julia DataFrame. The steps are shown in a Pluto notebook.
+tables to a Julia DataFrame. The relevant steps are discussed in this 
+[blog post](https://vnegi.hashnode.dev/working-with-sqlite-database-in-julia).
 
 ## Installation
 

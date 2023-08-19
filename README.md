@@ -24,10 +24,6 @@ tables to a Julia DataFrame. The relevant steps are discussed in this
     using Pluto
     Pluto.run()
 
-### Git LFS
-The database files (*.sqlite) are tracked using Large File Storage (LFS). If not already
-configured, follow the instructions [here.](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)
-
 Once everthing is set up, clone this repository and open **SQL_data_notebook.jl** in your 
 Pluto browser window. That's it, you should be good to go!
 

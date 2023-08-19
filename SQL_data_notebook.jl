@@ -7,11 +7,6 @@ using InteractiveUtils
 # ╔═╡ 8adc3334-fcd1-11ed-2f59-9fa2b2d3093f
 using SQLite, DataFrames, CSV, PlutoUI, HTTP
 
-# ╔═╡ 2f5a11f0-32cf-4aef-aed2-daaf50318aa7
-md"
-## Analysis of NIPS SQLite database using sqlite3 and Julia 
-"
-
 # ╔═╡ 6bc5a433-f8a2-4145-acd9-4f4dfab3fa56
 md"
 ## Load packages
@@ -29,6 +24,12 @@ md"
 
 # ╔═╡ b64ce361-4f4c-4992-b1a7-f49e1460bf99
 storj_url = "https://link.storjshare.io/s/juzz4fmc76kuym72xfjhoygxruxq/external/files/db/nips_papers.sqlite?download=1"
+
+# ╔═╡ f735bd59-940d-40fc-9e6d-85bdbd1bcb0e
+md"
+###### *Note for Windows users: Below function relies on the `wget` Linux utility to download the database from Storj link. This will not work on Windows. Hence, you will need to manually download the database file using the above URL.*
+"
+
 
 # ╔═╡ e5737f3c-dcc8-441d-a277-7ffc170b80fe
 """
@@ -53,10 +54,10 @@ function download_db(storj_url::String, fname::String)
 end
 
 # ╔═╡ c70fb6c6-56cd-4f80-973c-fa630ca3be4a
-download_db(storj_url, "storj_nips_papers.sqlite")
+download_db(storj_url, "nips_papers.sqlite")
 
 # ╔═╡ 7bfcd49e-38cb-4622-b9e9-cd1a5395049d
-db = SQLite.DB("input_sqlite_database/storj_nips_papers.sqlite")
+db = SQLite.DB("input_sqlite_database/nips_papers.sqlite")
 
 # ╔═╡ ddbb848a-1849-4670-8909-9a1496d9ee7d
 md"
@@ -775,12 +776,12 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─2f5a11f0-32cf-4aef-aed2-daaf50318aa7
 # ╟─6bc5a433-f8a2-4145-acd9-4f4dfab3fa56
 # ╠═8adc3334-fcd1-11ed-2f59-9fa2b2d3093f
 # ╟─de30a116-edc4-40e3-9591-2b7930904530
 # ╟─396409f8-b0b7-4730-9368-fa186eaaa7d8
 # ╠═b64ce361-4f4c-4992-b1a7-f49e1460bf99
+# ╟─f735bd59-940d-40fc-9e6d-85bdbd1bcb0e
 # ╟─e5737f3c-dcc8-441d-a277-7ffc170b80fe
 # ╠═c70fb6c6-56cd-4f80-973c-fa630ca3be4a
 # ╠═7bfcd49e-38cb-4622-b9e9-cd1a5395049d
